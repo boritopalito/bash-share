@@ -22,8 +22,7 @@ public class UploadFileAction {
     @PutMapping("{filename}")
     public ResponseEntity<Void> uploadFile(HttpServletRequest request, @PathVariable String filename) throws IOException {
         ServletInputStream inputStream = request.getInputStream();
-        UploadFileParameters uploadFileParameters = new UploadFileParameters(inputStream);
-        System.out.println(filename);
+        UploadFileParameters uploadFileParameters = new UploadFileParameters(filename, inputStream);
         UploadFileResult result = uploadFileUseCase.execute(uploadFileParameters);
         return ResponseEntity.ok().build();
     }
