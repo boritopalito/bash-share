@@ -1,4 +1,6 @@
 package nl.xx1.share.application.port.in.uploadfile;
 
-public record UploadFileResult() {
+import nl.xx1.share.domain.entity.File;
+
+public record UploadFileResult(File file) {
 }

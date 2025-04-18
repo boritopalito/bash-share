@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bash Share - CLI File Sharing</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: monospace;
+            background-color: #0a0a0a;
+            color: #33ff33;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Grid background */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                    linear-gradient(rgba(51, 255, 51, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(51, 255, 51, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            padding: 40px 20px;
+            border: 1px solid #33ff33;
+            box-shadow: 0 0 15px rgba(51, 255, 51, 0.2);
+            position: relative;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                    to bottom,
+                    transparent 50%,
+                    rgba(51, 255, 51, 0.03) 51%,
+                    transparent 52%
+            );
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(51, 255, 51, 0.7);
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+        }
+
+        p {
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .command-box {
+            background-color: #111;
+            padding: 20px;
+            border: 1px dashed #33ff33;
+            display: inline-block;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .command {
+            font-size: 1.2rem;
+            font-weight: bold;
+            position: relative;
+            z-index: 1;
+        }
+
+        .blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            color: #33ff33;
+            border: 1px solid #33ff33;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(51, 255, 51, 0.1);
+            box-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* Animations */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* Glitch effect */
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before, .glitch::after {
+            content: "BASH SHARE";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        .glitch::before {
+            color: #ff00ff;
+            z-index: -1;
+            animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+            animation-delay: 0.1s;
+        }
+
+        .glitch::after {
+            color: #00ffff;
+            z-index: -2;
+            animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+            animation-delay: 0.2s;
+        }
+
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+            20% {
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                transform: translate(-2px, -2px);
+            }
+            60% {
+                transform: translate(2px, 2px);
+            }
+            80% {
+                transform: translate(2px, -2px);
+            }
+            100% {
+                transform: translate(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .command {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 20px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="scanline"></div>
+    <div class="logo">></div>
+    <h1 class="glitch">BASH SHARE</h1>
+    <p>Upload files directly from your terminal with a simple command.</p>
+    <p>No signup. No nonsense. Just pure CLI file sharing.</p>
+
+    <div class="command-box">
+        <div class="command">$ curl bashshare.com -T file <span class="blink">_</span></div>
+        <button class="copy-btn" onclick="copyCommand()">COPY COMMAND</button>
+    </div>
+
+    <p>After uploading, you'll receive a unique URL to share your file.</p>
+
+    <div class="footer">
+        <p>Files are automatically deleted after 24 hours.</p>
+        <p>Maximum file size: 100MB</p>
+    </div>
+</div>
+
+<script>
+    function copyCommand() {
+        const command = "curl bashshare.com -T file";
+        navigator.clipboard.writeText(command).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.textContent = "COPIED!";
+            setTimeout(() => {
+                btn.textContent = "COPY COMMAND";
+            }, 2000);
+        });
+    }
+
+    // Add some retro terminal effects
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.container');
+
+        // Random glitch effect
+        setInterval(() => {
+            if (Math.random() > 0.97) {
+                container.style.transform = `translateX(${Math.random() * 3 - 1.5}px)`;
+                setTimeout(() => {
+                    container.style.transform = 'translateX(0)';
+                }, 100);
+            }
+        }, 2000);
+    });
+</script>
+</body>
+</html>

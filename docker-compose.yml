@@ -1,0 +1,26 @@
+services:
+  share-db:
+    image: postgres:15
+    container_name: share-db
+    environment:
+      POSTGRES_DB: share_db
+      POSTGRES_USER: share_user
+      POSTGRES_PASSWORD: share_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - share-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U share_user -d share_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  share-network:
+    driver: bridge
