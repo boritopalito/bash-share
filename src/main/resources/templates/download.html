@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Download</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: monospace;
+            background-color: #0a0a0a;
+            color: #33ff33;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                    linear-gradient(rgba(51, 255, 51, 0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(51, 255, 51, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            padding: 40px 20px;
+            border: 1px solid #33ff33;
+            box-shadow: 0 0 15px rgba(51, 255, 51, 0.2);
+            position: relative;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .file-info {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px dashed #33ff33;
+            background-color: #111;
+            text-align: left;
+        }
+
+        .file-detail {
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .file-detail-label {
+            width: 100px;
+            font-weight: bold;
+        }
+
+        .file-detail-value {
+            flex: 1;
+            word-break: break-all;
+        }
+
+        .download-btn {
+            background-color: transparent;
+            color: #33ff33;
+            border: 2px solid #33ff33;
+            padding: 15px 30px;
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .download-btn:hover {
+            background-color: rgba(51, 255, 51, 0.1);
+            box-shadow: 0 0 20px rgba(51, 255, 51, 0.5);
+        }
+
+        .command-container {
+            margin-top: 30px;
+            width: 100%;
+            text-align: left;
+            padding: 15px;
+            border: 1px dashed #33ff33;
+            background-color: #111;
+        }
+
+        .command-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .command-text {
+            background-color: #0a0a0a;
+            padding: 10px;
+            border: 1px solid rgba(51, 255, 51, 0.3);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            background-color: transparent;
+            color: #33ff33;
+            border: 2px solid #33ff33;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: monospace;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(51, 255, 51, 0.1);
+            box-shadow: 0 0 10px rgba(51, 255, 51, 0.5);
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                    to bottom,
+                    transparent 50%,
+                    rgba(51, 255, 51, 0.03) 51%,
+                    transparent 52%
+            );
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: rgba(51, 255, 51, 0.2);
+            border: 1px solid #33ff33;
+            color: #33ff33;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .notification.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="scanline"></div>
+    <h1>Download File</h1>
+
+    <div class="file-info">
+        <div class="file-detail">
+            <div class="file-detail-label">File Name:</div>
+            <div class="file-detail-value" id="fileName">example.txt</div>
+        </div>
+        <div class="file-detail">
+            <div class="file-detail-label">Size:</div>
+            <div class="file-detail-value" id="fileSize">1.2 MB</div>
+        </div>
+    </div>
+
+    <button class="download-btn" onclick="downloadFile()">
+        Download File
+    </button>
+
+    <div class="command-container">
+        <div class="command-title">Download via Command Line:</div>
+        <div class="command-text" id="downloadCommand">curl -O https://example.com/download/example.txt</div>
+        <button class="copy-btn" onclick="copyCommand()">Copy Command</button>
+    </div>
+</div>
+
+<div class="notification" id="notification">Command copied to clipboard!</div>
+
+<script>
+    // File information - replace with your actual data
+    const file = {
+        name: "example.txt",
+        size: "1.2 MB",
+        url: "https://example.com/download/example.txt"
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set file information
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileSize').textContent = file.size;
+        document.getElementById('downloadCommand').textContent = `curl -O ${file.url}`;
+
+        // Random glitch effect
+        const container = document.querySelector('.container');
+        setInterval(() => {
+            if (Math.random() > 0.97) {
+                container.style.transform = `translateX(${Math.random() * 3 - 1.5}px)`;
+                setTimeout(() => {
+                    container.style.transform = 'translateX(0)';
+                }, 100);
+            }
+        }, 2000);
+    });
+
+    function downloadFile() {
+        console.log(`Downloading ${file.name} from ${file.url}`);
+
+        // Create a temporary anchor element to trigger the download
+        const a = document.createElement('a');
+        a.href = file.url;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    function copyCommand() {
+        const commandText = document.getElementById('downloadCommand').textContent;
+        navigator.clipboard.writeText(commandText)
+            .then(() => {
+                showNotification('Command copied to clipboard!');
+            })
+            .catch(err => {
+                showNotification('Failed to copy command');
+                console.error('Failed to copy: ', err);
+            });
+    }
+
+    function showNotification(message) {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.classList.add('show');
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+</script>
+</body>
+</html>

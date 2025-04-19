@@ -3,13 +3,12 @@ package nl.xx1.share.infrastructure.persistence.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 
 @Entity(name = "file")
 @Builder

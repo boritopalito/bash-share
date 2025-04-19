@@ -1,6 +1,7 @@
 package nl.xx1.share.infrastructure.http.downloadfile;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.nio.file.Path;
 import nl.xx1.share.application.port.in.downloadfile.DownloadFileParameters;
 import nl.xx1.share.application.port.in.downloadfile.DownloadFileResult;
 import nl.xx1.share.application.port.in.downloadfile.DownloadFileUseCase;
@@ -14,12 +15,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.nio.file.Path;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @RestController
 @RequestMapping("/{filename}")
@@ -28,20 +25,25 @@ public class DownloadFileAction {
     private final RequestTypeDetector requestTypeDetector;
     private final String storageLocation;
 
-    public DownloadFileAction(DownloadFileUseCase downloadFileUseCase, RequestTypeDetector requestTypeDetector, @Value("${storage.location}") String storageLocation) {
+    public DownloadFileAction(
+            DownloadFileUseCase downloadFileUseCase,
+            RequestTypeDetector requestTypeDetector,
+            @Value("${storage.location}") String storageLocation) {
         this.downloadFileUseCase = downloadFileUseCase;
         this.requestTypeDetector = requestTypeDetector;
         this.storageLocation = storageLocation;
     }
 
     @GetMapping
-    public Object downloadFile(@PathVariable String filename,
-                                          HttpServletRequest request) {
+    public Object downloadFile(
+            @PathVariable String filename,
+            @RequestParam(defaultValue = "false") boolean force,
+            HttpServletRequest request) {
 
         boolean isBrowserRequest = requestTypeDetector.isBrowserRequest(request);
 
-        if (isBrowserRequest) {
-            return ResponseEntity.ok("Browser");
+        if (isBrowserRequest && !force) {
+            return new ModelAndView("download");
         }
 
         DownloadFileParameters parameters = new DownloadFileParameters(filename);

@@ -1,10 +1,9 @@
 package nl.xx1.share.domain.entity;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 @Getter

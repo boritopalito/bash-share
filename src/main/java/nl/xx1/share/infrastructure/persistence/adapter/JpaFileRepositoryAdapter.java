@@ -27,6 +27,9 @@ public class JpaFileRepositoryAdapter implements FileRepository {
 
     @Override
     public File getByFileName(String fileName) throws FileNotFound {
-        return jpaFileRepository.findJpaFileByName(fileName).map(fileMapper::of).orElseThrow(() -> new FileNotFound(fileName));
+        return jpaFileRepository
+                .findJpaFileByName(fileName)
+                .map(fileMapper::of)
+                .orElseThrow(() -> new FileNotFound(fileName));
     }
 }

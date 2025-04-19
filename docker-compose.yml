@@ -1,4 +1,17 @@
 services:
+  share-app:
+    build: .
+    container_name: share-app
+    depends_on:
+      share-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://share-db:5432/share_db
+    networks:
+      - share-network
+
   share-db:
     image: postgres:15
     container_name: share-db
